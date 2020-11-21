@@ -2,7 +2,7 @@
 // 而是在network中新建一个针对某个组件的网络请求js文件
 // 方便以后的维护
 
-import {request} from "./resquest"
+import {request} from "./request"
 
 export function getmultidata() {
   return request({

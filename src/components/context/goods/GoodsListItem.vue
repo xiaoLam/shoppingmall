@@ -1,8 +1,11 @@
 <template>
   <div class="goods-item">
-    <a :href="goodsitem.link">
-      <img :src="goodsitem.show.img" alt="" />
-    </a>
+    <img
+      :src="goodsitem.show.img"
+      alt=""
+      @load="imageload"
+      @click="itemClick"
+    />
     <div class="info">
       <p>{{ goodsitem.title }}</p>
       <span class="price">{{ goodsitem.price }}</span>
@@ -21,6 +24,15 @@ export default {
       default() {
         return {};
       },
+    },
+  },
+  methods: {
+    imageload() {
+      this.$bus.$emit("itemImageLoad");
+    },
+    itemClick() {
+      // 在点击图片后跳转路由, 并且带上数据的iid
+      this.$router.push("/detail/" + this.goodsitem.iid);
     },
   },
 };

@@ -2,21 +2,30 @@
   <div id="home">
     <nav-bar class="home-nav"><div slot="center">购物车</div></nav-bar>
 
+    <tab-control
+      :titles="['流行', '新款', '精选']"
+      class="tab-control"
+      @tabClick="tabClick"
+      ref="tabControlClone"
+      v-show="isTabFixed"
+    ></tab-control>
+
     <scroll
       class="content"
       ref="scroll"
       :probe-type="3"
       @scroll="scrollBack"
       :pullUpLoad="true"
-      @pullingUp="loadMore"
+      @pullingUp="MoreLoad"
     >
-      <home-swiper :banners="banners" />
+      <home-swiper :banners="banners" @swiperImgload="swiperImgload" />
       <recommend-view :recommends="recommends"></recommend-view>
       <feature-view />
       <tab-control
         :titles="['流行', '新款', '精选']"
         class="tab-control"
         @tabClick="tabClick"
+        ref="tabControl"
       ></tab-control>
       <goods-list :goods="showGoods" />
     </scroll>
@@ -40,6 +49,9 @@ import BackTop from "components/context/backTop/BackTop";
 
 // 引用本组件的网络请求js文件
 import { getmultidata, gethomegoods } from "network/home";
+
+// 在这里引入工具
+import { debounce } from "common/untils";
 
 export default {
   name: "Home",
@@ -67,6 +79,12 @@ export default {
       currentType: "pop",
       // 定义第三变量, 控制返回顶部按钮的显示和隐藏
       showBackTop: false,
+      // 记录TabControl的offsetTop值
+      tabControlOffsetTop: 0,
+      // 定义第三变量, 控制tabControl是否加上fixed样式
+      isTabFixed: false,
+      // 定义第三变量, 记录离开Home.vue的时候的滚动位置
+      scrollY: 0,
     };
   },
   computed: {
@@ -92,8 +110,9 @@ export default {
           this.currentType = "sell";
           break;
       }
-      this.$refs.scroll.scroll.refresh();
-      console.log("11");
+      // 让两个TabControl组件同步起来
+      this.$refs.tabControl.contorlIndex = index;
+      this.$refs.tabControlClone.contorlIndex = index;
     },
     // 点击返回顶部按钮的时候, 调用scroll组件中的scrollTo方法返回顶部
     backClick() {
@@ -101,10 +120,20 @@ export default {
     },
     // 通过自定义事件获取从scroll传递过来的position, 以此判断返回顶部按钮的显示和隐藏
     scrollBack(position) {
+      // 决定返回顶部按钮是否显示
       this.showBackTop = -position.y > 1000 ? true : false;
+
+      // 决定tabControl是否加上fixed样式
+      this.isTabFixed = -position.y > this.tabControlOffsetTop ? true : false;
     },
-    loadMore() {
+    // 监听到滚动到了底部的方法后,调用gethomegoods方法加载更多的goods
+    MoreLoad() {
       this.gethomegoods(this.currentType);
+    },
+    // 动态地获取tabControl的offsetTop
+    swiperImgload() {
+      // 获取TabControl的offsetTop值
+      this.tabControlOffsetTop = this.$refs.tabControl.$el.offsetTop;
     },
 
     /*
@@ -127,9 +156,8 @@ export default {
         this.goods[type].list.push(...res.data.list);
         this.goods[type].page += 1;
 
-        // 在每次加载完图片重置better-scroll
+        // 完成上拉加载更多后重置pullUpLoad
         this.$refs.scroll.finishPullUp();
-        this.$refs.scroll.scroll.refresh();
       });
     },
   },
@@ -144,6 +172,25 @@ export default {
     this.gethomegoods("pop");
     this.gethomegoods("new");
     this.gethomegoods("sell");
+  },
+
+  activated() {
+    // 进入Home.vue的时候将滚动设置到记录的滚动位置
+    this.$refs.scroll.scrollTo(0, this.scrollY, 0);
+    // 注意: 在设置完之后重置一下better-scroll实例
+    this.$refs.scroll.refresh();
+  },
+  deactivated() {
+    // 记录离开Home.vue的时候的滚动位置
+    this.scrollY = this.$refs.scroll.getScrollY();
+  },
+  // 注意要在mounted中获取DOM元素
+  mounted() {
+    // 监听goodslistitem中的图片加载完毕事件
+    const refresh = debounce(this.$refs.scroll.refresh, 50);
+    this.$bus.$on("itemImageLoad", () => {
+      refresh();
+    });
   },
 };
 </script>
@@ -160,20 +207,23 @@ export default {
   background-color: var(--color-tint);
   color: #fff;
 
-  position: fixed;
+  /* position: fixed;
   left: 0;
   right: 0;
   top: 0;
-  z-index: 9;
+  z-index: 9; */
 }
 
 /* 在这里简单实现以下 tabControl 的向下滚动后粘附顶部的效果 */
 .tab-control {
   /* 使用了better-scroll后这个sticky粘性定位就没有效果了 */
-  /* position: sticky; */
+  /* position: sticky;
   top: 43px;
+  z-index: 9; */
+  position: relative;
   z-index: 9;
 }
+
 /* 第一种方法: 通过定位来撑开盒子 */
 .content {
   overflow: hidden;

@@ -3,7 +3,7 @@
   <div class="goods">
     <!-- 遍历生成 goods-list-item -->
     <!-- 将goods中的每一个goods通过props传给GoodsListItem -->
-    <goods-list-item v-for="item in goods" :goodsitem="item" />
+    <goods-list-item v-for="item in goods" :goodsitem="item" :key="item.iid" />
   </div>
 </template>
 
