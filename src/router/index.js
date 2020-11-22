@@ -32,7 +32,7 @@ const routes = [
     component : Profile
   },
   {
-    // 设置详情页映射关系, 通过动态路由
+    // 设置详情页映射关系, 使用的是动态路由
     path : "/detail/:iid",
     component : Detail
   }
