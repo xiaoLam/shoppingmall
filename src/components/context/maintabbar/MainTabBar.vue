@@ -1,6 +1,6 @@
 <template>
   <tar-bar>
-    <tar-bar-item path="/home" activeColor="orange">
+    <tar-bar-item path="/home">
       <img slot="item-icon" src="~assets/img/tabbar/home.svg" alt="" />
       <img
         slot="item-icon-active"
@@ -9,7 +9,7 @@
       />
       <div slot="item-text">首页</div>
     </tar-bar-item>
-    <tar-bar-item path="/category" activeColor="orange">
+    <tar-bar-item path="/category">
       <img slot="item-icon" src="~assets/img/tabbar/category.svg" alt="" />
       <img
         slot="item-icon-active"
@@ -18,7 +18,7 @@
       />
       <div slot="item-text">分类</div>
     </tar-bar-item>
-    <tar-bar-item path="/cart" activeColor="orange">
+    <tar-bar-item path="/cart">
       <img slot="item-icon" src="~assets/img/tabbar/shopcart.svg" alt="" />
       <img
         slot="item-icon-active"
@@ -28,7 +28,7 @@
 
       <div slot="item-text">购物车</div>
     </tar-bar-item>
-    <tar-bar-item path="/profile" activeColor="orange">
+    <tar-bar-item path="/profile">
       <img slot="item-icon" src="~assets/img/tabbar/profile.svg" alt="" />
       <img
         slot="item-icon-active"

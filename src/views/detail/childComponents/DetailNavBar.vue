@@ -34,6 +34,9 @@ export default {
   methods: {
     titleClick(index) {
       this.currentType = index;
+
+      // 将点击标题的事件传给Detail.vue组件让其调用滚动到对应位置的操作
+      this.$emit("titleClick", index);
     },
     backClick() {
       this.$router.back();

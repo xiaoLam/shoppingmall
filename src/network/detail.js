@@ -10,6 +10,13 @@ export function getDetail(iid) {
   })
 }
 
+// 请求详情页推荐数据
+export function getRecommends() {
+  return request({
+    url : "/recommend"
+  })
+}
+
 // 创建一个class 传入一些杂乱的数据, 返回一个筛选过的有序的数据对象
 // 返回的是商品详情页中的GoodsInfo数据
 export class GoodsInfo {

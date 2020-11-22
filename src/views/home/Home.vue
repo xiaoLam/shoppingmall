@@ -15,7 +15,7 @@
       ref="scroll"
       :probe-type="3"
       @scroll="scrollBack"
-      :pullUpLoad="true"
+      :pull-up-load="true"
       @pullingUp="MoreLoad"
     >
       <home-swiper :banners="banners" @swiperImgload="swiperImgload" />
@@ -50,8 +50,8 @@ import BackTop from "components/context/backTop/BackTop";
 // 引用本组件的网络请求js文件
 import { getmultidata, gethomegoods } from "network/home";
 
-// 在这里引入工具
-import { debounce } from "common/untils";
+// 引入mixin.js 混入的文件
+import { imageLoadListenMixin } from "common/mixin";
 
 export default {
   name: "Home",
@@ -129,6 +129,10 @@ export default {
     // 监听到滚动到了底部的方法后,调用gethomegoods方法加载更多的goods
     MoreLoad() {
       this.gethomegoods(this.currentType);
+
+      // 有时候会发现跳转到详情页后返回首页的时候, 滚动到底部的时候, 无法滚动的情况
+      // 所以在这个地方也对better-scroll做一个重置
+      this.$refs.scroll.refresh();
     },
     // 动态地获取tabControl的offsetTop
     swiperImgload() {
@@ -161,6 +165,8 @@ export default {
       });
     },
   },
+  mixins: [imageLoadListenMixin],
+
   // 在组件创建完毕的时候发送网络请求
   created() {
     // 在生命周期函数中只写主要的逻辑, 具体操作应该写在组件的methods中
@@ -183,14 +189,23 @@ export default {
   deactivated() {
     // 记录离开Home.vue的时候的滚动位置
     this.scrollY = this.$refs.scroll.getScrollY();
+
+    // 离开的时候取消监听事件总线中的图片加载事件
+    this.$bus.$off("itemImageLoad", this.ImageLoadListen);
   },
   // 注意要在mounted中获取DOM元素
   mounted() {
     // 监听goodslistitem中的图片加载完毕事件
-    const refresh = debounce(this.$refs.scroll.refresh, 50);
-    this.$bus.$on("itemImageLoad", () => {
+    /* const refresh = debounce(this.$refs.scroll.refresh, 100);
+    this.$bus.$on("homeitemImageLoad", () => {
       refresh();
-    });
+    }); */
+    // 一下代码抽离到common/mixin.js文件中了
+    /* const refresh = debounce(this.$refs.scroll.refresh, 100);
+    this.ImageLoadListen = () => {
+      refresh();
+    };
+    this.$bus.$on("itemImageLoad", this.ImageLoadListen); */
   },
 };
 </script>

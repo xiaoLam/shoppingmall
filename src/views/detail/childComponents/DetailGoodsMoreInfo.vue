@@ -50,11 +50,11 @@ export default {
     },
   },
   // watch中的方法可以监听某个属性的改变, 如果改变了会调用函数
-  watch: {
+  /* watch: {
     goodsMoreInfo() {
       this.imagesLength = this.goodsMoreInfo.detailImage[0].list.length;
     },
-  },
+  }, */
 };
 </script>
 

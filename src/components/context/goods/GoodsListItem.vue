@@ -1,11 +1,6 @@
 <template>
   <div class="goods-item">
-    <img
-      :src="goodsitem.show.img"
-      alt=""
-      @load="imageload"
-      @click="itemClick"
-    />
+    <img :src="showImg" alt="" @load="imageload" @click="itemClick" />
     <div class="info">
       <p>{{ goodsitem.title }}</p>
       <span class="price">{{ goodsitem.price }}</span>
@@ -26,12 +21,26 @@ export default {
       },
     },
   },
+  computed: {
+    showImg() {
+      return this.goodsitem.image || this.goodsitem.show.img;
+    },
+  },
   methods: {
     imageload() {
       this.$bus.$emit("itemImageLoad");
+
+      /* if (this.$route.path.indexOf("/home") >= 0) {
+        this.$bus.$emit("homeitemImageLoad");
+      } else if (this.$route.path.indexOf("/detail") >= 0) {
+        this.$bus.$emit("detailitemImageLoad");
+      } */
     },
     itemClick() {
       // 在点击图片后跳转路由, 并且带上数据的iid
+      // 理论上在详情页的推荐模块中点击推荐的商品也可以跳转路由并带上iid
+      // 但是可惜后端并没有做推荐商品的数据, 所以只好放弃这个
+      // const id = this.goodsitem.iid || this.goodsitem.item_id;
       this.$router.push("/detail/" + this.goodsitem.iid);
     },
   },

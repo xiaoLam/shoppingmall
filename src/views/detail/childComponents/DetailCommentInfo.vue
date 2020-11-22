@@ -1,27 +1,29 @@
 <template>
-  <div v-if="Object.keys(commentInfo).length !== 0" class="comment-info">
+  <div class="comment-info">
     <div class="info-header">
       <div class="header-title">用户评价</div>
       <div class="header-more">更多</div>
     </div>
-    <div class="info-user">
-      <img :src="commentInfo.user.avatar" alt="" />
-      <span class="user-name">{{ commentInfo.user.uname }}</span>
-    </div>
-    <div class="info-detail">
-      <div class="detail-comment">{{ commentInfo.content }}</div>
-      <div class="detail-other">
-        <!-- 这里使用了过滤器, 其本质就是将commentInfo.created作为参数传入 filters中的showDate方法中, 然后将返回的结果进行展示 -->
-        <span class="date">{{ commentInfo.created | showDate }}</span>
-        <span>{{ commentInfo.style }}</span>
+    <div v-if="Object.keys(commentInfo).length !== 0">
+      <div class="info-user">
+        <img :src="commentInfo.user.avatar" alt="" />
+        <span class="user-name">{{ commentInfo.user.uname }}</span>
       </div>
-      <div class="detail-img">
-        <img
-          v-for="(item, index) in commentInfo.images"
-          :key="index"
-          :src="item"
-          alt=""
-        />
+      <div class="info-detail">
+        <div class="detail-comment">{{ commentInfo.content }}</div>
+        <div class="detail-other">
+          <!-- 这里使用了过滤器, 其本质就是将commentInfo.created作为参数传入 filters中的showDate方法中, 然后将返回的结果进行展示 -->
+          <span class="date">{{ commentInfo.created | showDate }}</span>
+          <span>{{ commentInfo.style }}</span>
+        </div>
+        <div class="detail-img">
+          <img
+            v-for="(item, index) in commentInfo.images"
+            :key="index"
+            :src="item"
+            alt=""
+          />
+        </div>
       </div>
     </div>
   </div>
