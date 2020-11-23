@@ -45,13 +45,12 @@ import NavBar from "components/common/navbar/NavBar";
 import TabControl from "components/context/tabControl/TabControl";
 import GoodsList from "components/context/goods/GoodsList";
 import Scroll from "components/common/scroll/Scroll";
-import BackTop from "components/context/backTop/BackTop";
 
 // 引用本组件的网络请求js文件
 import { getmultidata, gethomegoods } from "network/home";
 
 // 引入mixin.js 混入的文件
-import { imageLoadListenMixin } from "common/mixin";
+import { imageLoadListenMixin, BackTopMixin } from "common/mixin";
 
 export default {
   name: "Home",
@@ -63,7 +62,6 @@ export default {
     TabControl,
     GoodsList,
     Scroll,
-    BackTop,
   },
   data() {
     return {
@@ -77,12 +75,13 @@ export default {
       },
       // 定义第三变量, 控制展示的goodslist
       currentType: "pop",
-      // 定义第三变量, 控制返回顶部按钮的显示和隐藏
-      showBackTop: false,
+
       // 记录TabControl的offsetTop值
       tabControlOffsetTop: 0,
+
       // 定义第三变量, 控制tabControl是否加上fixed样式
       isTabFixed: false,
+
       // 定义第三变量, 记录离开Home.vue的时候的滚动位置
       scrollY: 0,
     };
@@ -114,14 +113,11 @@ export default {
       this.$refs.tabControl.contorlIndex = index;
       this.$refs.tabControlClone.contorlIndex = index;
     },
-    // 点击返回顶部按钮的时候, 调用scroll组件中的scrollTo方法返回顶部
-    backClick() {
-      this.$refs.scroll.scrollTo(0, 0, 500);
-    },
+
     // 通过自定义事件获取从scroll传递过来的position, 以此判断返回顶部按钮的显示和隐藏
     scrollBack(position) {
       // 决定返回顶部按钮是否显示
-      this.showBackTop = -position.y > 1000 ? true : false;
+      this.listenShowBackTop(position);
 
       // 决定tabControl是否加上fixed样式
       this.isTabFixed = -position.y > this.tabControlOffsetTop ? true : false;
@@ -165,7 +161,7 @@ export default {
       });
     },
   },
-  mixins: [imageLoadListenMixin],
+  mixins: [imageLoadListenMixin, BackTopMixin],
 
   // 在组件创建完毕的时候发送网络请求
   created() {

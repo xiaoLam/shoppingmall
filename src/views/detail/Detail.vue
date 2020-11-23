@@ -21,6 +21,8 @@
       <p ref="recommend" class="recommends-text">更多商品推荐</p>
       <goods-list :goods="recommends" />
     </scroll>
+    <back-top @click.native="backClick" v-show="showBackTop" />
+    <detail-bottom-bar @addToCart="addToCart" />
   </div>
 </template>
 
@@ -37,6 +39,7 @@ import DetailShopInfo from "./childComponents/DetailShopInfo";
 import DetailGoodsMoreInfo from "./childComponents/DetailGoodsMoreInfo";
 import DetailParamsInfo from "./childComponents/DetailParamsInfo";
 import DetailCommentInfo from "./childComponents/DetailCommentInfo";
+import DetailBottomBar from "./childComponents/DetailBottomBar";
 
 // 引入网络请求方法
 import {
@@ -48,7 +51,7 @@ import {
 } from "network/detail";
 
 // 引入mixin 混入文件
-import { imageLoadListenMixin } from "common/mixin";
+import { imageLoadListenMixin, BackTopMixin } from "common/mixin";
 
 export default {
   name: "Detail",
@@ -60,6 +63,7 @@ export default {
     DetailGoodsMoreInfo,
     DetailParamsInfo,
     DetailCommentInfo,
+    DetailBottomBar,
     Scroll,
     GoodsList,
   },
@@ -90,8 +94,7 @@ export default {
       this.themeYs.push(this.$refs.param.$el.offsetTop);
       this.themeYs.push(this.$refs.comment.$el.offsetTop);
       this.themeYs.push(this.$refs.recommend.offsetTop);
-
-      console.log(this.themeYs);
+      this.themeYs.push(Number.MAX_VALUE);
     },
 
     // 监听标题点击的事件
@@ -101,13 +104,13 @@ export default {
     },
 
     // 监听详情页面的滚动事件
-    detailScroll() {
+    detailScroll(position) {
       // 获得当前页面滚到的位置
-      const positionY = -this.$refs.scroll.getScrollY();
+      const positionY = -position.y;
 
       // 根据当前页面滚到的位置和各个theme的对应位置作一个判断
 
-      for (let i = 0; i < this.themeYs.length; i++) {
+      /* for (let i = 0; i < this.themeYs.length; i++) {
         if (
           this.$refs.detailNavBar.currentType !== i &&
           ((i < this.themeYs.length - 1 &&
@@ -117,11 +120,39 @@ export default {
         ) {
           this.$refs.detailNavBar.currentType = i;
         }
+      } */
+
+      // hack做法, 给themeYs这个数组push一个很大的值, 就不需要像上面代码那样做那么多判断了
+      for (let i = 0; i < this.themeYs.length - 1; i++) {
+        if (
+          this.$refs.detailNavBar.currentType !== i &&
+          positionY >= this.themeYs[i] &&
+          positionY < this.themeYs[i + 1]
+        ) {
+          this.$refs.detailNavBar.currentType = i;
+        }
       }
+
+      this.listenShowBackTop(position);
+    },
+
+    // 监听加入购物车点击事件
+    addToCart() {
+      // 将需要展示在购物车中的信息整理成一个对象
+      const product = {};
+      product.image = this.topImages[0];
+      product.title = this.goodsInfo.title;
+      product.desc = this.goodsInfo.desc;
+      product.price = this.goodsInfo.realPrice;
+      product.id = this.id;
+
+      // 将这个对象存放在vuex共享数据对象中
+      // 注意所有修改state中的数据只能通过mutations
+      this.$store.dispatch("addCart", product);
     },
   },
   // 使用mixin.js中的方法
-  mixins: [imageLoadListenMixin],
+  mixins: [imageLoadListenMixin, BackTopMixin],
   created() {
     // 在组件创建完毕后, 获取从GoodsListItem路由传过来的iid
     this.id = this.$route.params.iid;
@@ -231,7 +262,7 @@ export default {
   height: 100vh;
 }
 .content {
-  height: calc(100% - 44px);
+  height: calc(100% - 44px - 49px);
 }
 .detail-nav {
   position: relative;
