@@ -1,4 +1,4 @@
-import {COUNT_ADD,ADD_TO_CART} from "./mutation-type"
+import {COUNT_ADD,ADD_TO_CART,REFRESH_CHECK} from "./mutation-type"
 
 export default {
   addCart(context, payload) {
@@ -28,15 +28,29 @@ export default {
 
     // 第二种方法
     // 通过数组方法 find
-    let oldProduct = context.state.productList.find((item) => {
-      return payload.id == item.id
-    })
 
-    if (oldProduct) {
-      context.commit(COUNT_ADD, oldProduct)
-    }else {
-      payload.count = 1
-      context.commit(ADD_TO_CART, payload)
-    }
-  }
+    // 通过Promise对象向Detail组件返回一个信息
+    return new Promise((resolve, reject) => {
+      let oldProduct = context.state.productList.find((item) => {
+        return payload.id == item.id
+      })
+      if (oldProduct) {
+        context.commit(COUNT_ADD, oldProduct)
+        resolve("当前商品数量+1")
+      }else {
+        payload.count = 1
+        context.commit(ADD_TO_CART, payload)
+        resolve("成功添加入购物车")
+      }
+    })
+  },
+
+  // 购物车页面改变商品是否选中
+  changeCheck(context,payload) {
+    let changeProduct = context.state.productList.find((item) => {
+      return payload == item.id
+    })
+    context.commit(REFRESH_CHECK, changeProduct)
+  },
+
 }

@@ -52,6 +52,7 @@ export default {
 .flex-item img {
   height: 20px;
   width: 20px;
+  margin: 4px;
 
   vertical-align: middle;
   margin-top: 3px;

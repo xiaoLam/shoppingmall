@@ -53,6 +53,9 @@ import {
 // 引入mixin 混入文件
 import { imageLoadListenMixin, BackTopMixin } from "common/mixin";
 
+// 调用actions映射
+import { mapActions } from "vuex";
+
 export default {
   name: "Detail",
   components: {
@@ -82,6 +85,8 @@ export default {
     };
   },
   methods: {
+    ...mapActions(["addCart"]),
+
     // 为了更新better-scroll中设置的高度, 监听DetailSwiper中轮播图的加载
     // 在接收到自定义事件后,调用scroll中的refresh方法,重置better-scroll中设置的高度,避免无法滚动的bug
     refreshBetterScroll() {
@@ -148,7 +153,23 @@ export default {
 
       // 将这个对象存放在vuex共享数据对象中
       // 注意所有修改state中的数据只能通过mutations
-      this.$store.dispatch("addCart", product);
+
+      // actions中完成异步操作后会返回一个new Promise对象, 所以我们可以直接用then
+      /* this.$store.dispatch("addCart", product).then((res) => {
+        console.log(res);
+      }); */
+
+      // 像getters一样, actions也是可以映射到组件中的
+      this.addCart(product).then((res) => {
+        /* this.message = res;
+        this.show = true;
+
+        setTimeout(() => {
+          this.show = false;
+          this.message = "";
+        }, 1500); */
+        this.$toast.show(res);
+      });
     },
   },
   // 使用mixin.js中的方法
@@ -263,6 +284,9 @@ export default {
 }
 .content {
   height: calc(100% - 44px - 49px);
+  /* 记得要加over-flow: hidden */
+  /* 否则页面中就可以通过鼠标滚轮滚动了, 而我们是不需要这个的 */
+  overflow: hidden;
 }
 .detail-nav {
   position: relative;
