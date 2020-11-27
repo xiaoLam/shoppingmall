@@ -187,7 +187,7 @@ export default {
     this.scrollY = this.$refs.scroll.getScrollY();
 
     // 离开的时候取消监听事件总线中的图片加载事件
-    this.$bus.$off("itemImageLoad", this.ImageLoadListen);
+    /* this.$bus.$off("itemImageLoad", this.ImageLoadListen); */
   },
   // 注意要在mounted中获取DOM元素
   mounted() {

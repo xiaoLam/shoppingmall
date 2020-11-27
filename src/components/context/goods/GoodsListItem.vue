@@ -23,7 +23,9 @@ export default {
   },
   computed: {
     showImg() {
-      return this.goodsitem.image || this.goodsitem.show.img;
+      return (
+        this.goodsitem.img || this.goodsitem.image || this.goodsitem.show.img
+      );
     },
   },
   methods: {

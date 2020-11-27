@@ -10,12 +10,17 @@ export const imageLoadListenMixin = {
       refresh : null
     }
   },
+  deactivated() {
+    this.$bus.$off("itemImageLoad", this.ImageLoadListen);
+  },
   mounted() {
     // 监听goodslistitem中的图片加载完毕事件
     this.refresh = debounce(this.$refs.scroll.refresh, 50);
     this.ImageLoadListen = () => {
       this.refresh();
     };
+  },
+  activated() {
     this.$bus.$on("itemImageLoad", this.ImageLoadListen);
   }
 }
