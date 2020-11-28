@@ -104,6 +104,8 @@ export default {
       const mailKey = this.categories[index].maitKey;
       getSubcategory(mailKey).then((res) => {
         this.categoryData[index].subcategories = res.data;
+
+        // 利用扩展运算符重新赋值的方法, 触发Vue的响应机制
         this.categoryData = { ...this.categoryData };
 
         // 请求getCategoryDetai的数据
@@ -119,6 +121,7 @@ export default {
       // 2. 发送请求, 传入miniWallkey和type
       getCategoryDetail(miniWallkey, type).then((res) => {
         this.categoryData[this.currentIndex].categoryDetail[type] = res;
+        // 利用扩展运算符重新赋值的方法, 触发Vue的响应机制
         this.categoryData = { ...this.categoryData };
       });
     },
